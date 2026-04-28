@@ -22,7 +22,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm install --loglevel error
+RUN npm install --loglevel error --verbose
 
 # Copy Prisma schema
 COPY prisma ./prisma/

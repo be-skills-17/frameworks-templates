@@ -9,7 +9,7 @@ RUN if [ -n "$NPM_REGISTRY" ]; then \
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install --loglevel error
+RUN npm install --loglevel error --verbose
 COPY . .
 
 EXPOSE 80
