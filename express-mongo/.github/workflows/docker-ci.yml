@@ -30,7 +30,7 @@ jobs:
         MONGO_PASS: ${{ secrets.MONGO_PASS }}
       run: |
         DOCKER_BUILDKIT=0 docker build \
-          --network traefik-network \
+          --network gitea \
           --build-arg NPM_REGISTRY=${NPM_REGISTRY} \
           --build-arg MONGO_HOST=${MONGO_HOST} \
           --build-arg MONGO_DB=${MONGO_DB} \
