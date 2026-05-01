@@ -35,13 +35,14 @@ jobs:
       env:
         DOMAIN: ${{ secrets.DOMAIN }}
       run: |
+        IMAGE_BASE="git.${DOMAIN}/${{ github.repository }}"
         mkdir -p /tmp/error-page
         cd /tmp/error-page
         cat > Dockerfile << 'EOF'
         FROM nginx:alpine
         RUN echo '<html><head><style>body{font-family:system-ui;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#1a1a2e;color:#fff}.container{text-align:center;padding:2rem;border-radius:10px;background:#16213e;box-shadow:0 0 20px rgba(0,0,0,0.5)}h1{color:#e94560;margin:0 0 1rem}p{color:#a0a0a0}</style></head><body><div class="container"><h1>Build Failed</h1><p>Check Gitea Actions for build errors</p></div></body></html>' > /usr/share/nginx/html/index.html
         EOF
-        DOCKER_BUILDKIT=0 docker build . --tag git.${DOMAIN}/${{ github.repository }}:latest
+        DOCKER_BUILDKIT=0 docker build . --tag ${IMAGE_BASE}:latest --tag ${IMAGE_BASE}:${{ github.sha }}
 
     - name: Docker login
       env:
