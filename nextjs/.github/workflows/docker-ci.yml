@@ -18,6 +18,13 @@ jobs:
         git clone --depth 1 http://${GIT_USER}:${GIT_PASS}@gitea:3000/${{ github.repository }}.git .
         git checkout ${{ github.sha }}
 
+    # Generate version tag based on Unix time (avoids conflicts after repo deletion)
+    - name: Generate Version Tag
+      run: |
+        UNIX_TAG="1.0.$(date +%s)"
+        echo "BUILD_VERSION=$UNIX_TAG" >> $GITHUB_ENV
+        echo "Generated version: $UNIX_TAG"
+
     - name: Build the Docker image
       id: build
       continue-on-error: true
@@ -25,23 +32,31 @@ jobs:
         DOMAIN: ${{ secrets.DOMAIN }}
         NPM_REGISTRY: ${{ secrets.NPM_REGISTRY_URL }}
       run: |
+        IMAGE_BASE="git.${DOMAIN}/${{ github.repository }}"
+        echo "Building $IMAGE_BASE:latest and $IMAGE_BASE:${{ env.BUILD_VERSION }}"
+        
         DOCKER_BUILDKIT=0 docker build \
           --network gitea \
           --build-arg NPM_REGISTRY=${NPM_REGISTRY} \
-          . --file Dockerfile --tag git.${DOMAIN}/${{ github.repository }}:latest
+          . --file Dockerfile \
+          --tag ${IMAGE_BASE}:latest \
+          --tag ${IMAGE_BASE}:${{ env.BUILD_VERSION }}
 
     - name: Build error page on failure
       if: steps.build.outcome == 'failure'
       env:
         DOMAIN: ${{ secrets.DOMAIN }}
       run: |
+        IMAGE_BASE="git.${DOMAIN}/${{ github.repository }}"
         mkdir -p /tmp/error-page
         cd /tmp/error-page
         cat > Dockerfile << 'EOF'
         FROM nginx:alpine
         RUN echo '<html><head><style>body{font-family:system-ui;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#1a1a2e;color:#fff}.container{text-align:center;padding:2rem;border-radius:10px;background:#16213e;box-shadow:0 0 20px rgba(0,0,0,0.5)}h1{color:#e94560;margin:0 0 1rem}p{color:#a0a0a0}</style></head><body><div class="container"><h1>Build Failed</h1><p>Check Gitea Actions for build errors</p></div></body></html>' > /usr/share/nginx/html/index.html
         EOF
-        DOCKER_BUILDKIT=0 docker build . --tag git.${DOMAIN}/${{ github.repository }}:latest
+        DOCKER_BUILDKIT=0 docker build . \
+          --tag ${IMAGE_BASE}:latest \
+          --tag ${IMAGE_BASE}:${{ env.BUILD_VERSION }}
 
     - name: Docker login
       env:
@@ -50,18 +65,25 @@ jobs:
         DOMAIN: ${{ secrets.DOMAIN }}
       run: echo "$PASS" | docker login -u "$USER" --password-stdin git.${DOMAIN}
 
-    - name: Push image
+    - name: Push images (latest + version)
       env:
         DOMAIN: ${{ secrets.DOMAIN }}
       run: |
-        IMAGE="git.${DOMAIN}/${{ github.repository }}:latest"
-        for attempt in 1 2 3; do
-          docker push "$IMAGE" && break
-          echo "Push attempt $attempt failed, retrying in $((attempt * 5))s..."
-          sleep $((attempt * 5))
+        IMAGE_BASE="git.${DOMAIN}/${{ github.repository }}"
+        
+        # List of tags to push
+        TAGS=("latest" "${{ env.BUILD_VERSION }}")
+        
+        for TAG in "${TAGS[@]}"; do
+          FULL_IMAGE="${IMAGE_BASE}:${TAG}"
+          echo "Pushing $FULL_IMAGE..."
+          for attempt in 1 2 3; do
+            docker push "$FULL_IMAGE" && break
+            echo "Push attempt $attempt failed for $TAG, retrying in $((attempt * 5))s..."
+            sleep $((attempt * 5))
+          done
         done
-        docker push "$IMAGE" 2>/dev/null || exit 1
-        echo "Image pushed. Watchtower will auto-deploy within 30 seconds."
+        echo "Images pushed. WUD will detect the new version based on semantic tag."
 
     - name: Notify package cache update
       if: always()
