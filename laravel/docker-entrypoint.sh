@@ -4,13 +4,21 @@
 
 echo "=== Laravel Container Starting ==="
 
+# Run artisan as the web server user so files it creates stay writable by Apache
+artisan() {
+    su -s /bin/sh www-data -c "php artisan $*"
+}
+
+# Fix ownership in case anything was created as root
+chown -R www-data:www-data storage bootstrap/cache
+
 echo "Creating storage symlink..."
-php artisan storage:link --force 2>/dev/null || true
+artisan storage:link --force 2>/dev/null || true
 
 # Clear caches to avoid stale config from build phase
-php artisan config:clear 2>/dev/null || true
-php artisan route:clear 2>/dev/null || true
-php artisan view:clear 2>/dev/null || true
+artisan config:clear 2>/dev/null || true
+artisan route:clear 2>/dev/null || true
+artisan view:clear 2>/dev/null || true
 
 # Run migrations in background so Apache starts immediately
 (
@@ -18,7 +26,7 @@ php artisan view:clear 2>/dev/null || true
     TRIES=0
 
     while [ $TRIES -lt $MAX_TRIES ]; do
-        if php artisan migrate --force 2>&1 | tee /tmp/migrate.log | grep -qE "(Migrating|Nothing to migrate|migrated)"; then
+        if artisan migrate --force 2>&1 | tee /tmp/migrate.log | grep -qE "(Migrating|Nothing to migrate|migrated)"; then
             echo "  Migrations completed successfully"
             break
         fi
