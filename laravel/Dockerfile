@@ -59,14 +59,6 @@ RUN if [ -n "$NPM_REGISTRY" ]; then \
 # Copy application code
 COPY . .
 
-# Force correct values in .env (overrides any competitor changes)
-RUN sed -i "s|^DB_DATABASE=.*|DB_DATABASE=${DB_NAME}|" .env && \
-    sed -i "s|^DB_USERNAME=.*|DB_USERNAME=${DB_USERNAME}|" .env && \
-    sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=${DB_PASSWORD}|" .env && \
-    sed -i "s|^DB_HOST=.*|DB_HOST=${DB_HOST}|" .env && \
-    sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env && \
-    sed -i "s|^DB_CONNECTION=.*|DB_CONNECTION=mysql|" .env
-
 # Generate Laravel APP_KEY automatically
 RUN php artisan key:generate --ansi --quiet
 
