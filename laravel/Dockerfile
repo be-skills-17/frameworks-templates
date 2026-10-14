@@ -39,20 +39,12 @@ COPY composer.json composer.lock* ./
 
 # Trust self-signed SSL cert (for internal HTTPS services like Packeton/Gitea)
 # ssl-cert.crt is copied into build context by CI workflow
-COPY ssl-cert.crt* /tmp/
 RUN apt-get update -qq && apt-get install -qq -y ca-certificates > /dev/null && rm -rf /var/lib/apt/lists/* \
     && if [ -f /tmp/ssl-cert.crt ]; then \
         cp /tmp/ssl-cert.crt /usr/local/share/ca-certificates/ssl-cert.crt && \
         update-ca-certificates; \
     fi
 
-# Configure Composer to use caching proxy (if provided)
-# disable-tls for isolated network with self-signed certs
-RUN if [ -n "$COMPOSER_PROXY" ]; then \
-        composer config --global repo.packagist composer "$COMPOSER_PROXY" && \
-        composer config --global disable-tls true; \
-    fi && \
-    composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts --quiet
 
 # Copy package files for Node.js dependencies
 COPY package.json package-lock.json* ./
@@ -60,8 +52,7 @@ COPY package.json package-lock.json* ./
 # Configure npm to use Verdaccio cache (if NPM_REGISTRY provided)
 ARG NPM_REGISTRY
 RUN if [ -n "$NPM_REGISTRY" ]; then \
-        npm config set registry "$NPM_REGISTRY" && \
-        npm config set strict-ssl false; \
+        npm config set registry "$NPM_REGISTRY"; \
     fi && \
     npm install --loglevel error
 
