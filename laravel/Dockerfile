@@ -59,8 +59,11 @@ RUN if [ -n "$NPM_REGISTRY" ]; then \
 # Copy application code
 COPY . .
 
-# Generate Laravel APP_KEY automatically
-RUN php artisan key:generate --ansi --quiet
+# Generate APP_KEY only when .env has none, so the competitor's key survives every build
+# (--force: key:generate refuses to run non-interactively when APP_ENV=production)
+RUN if [ -f .env ] && ! grep -qE '^APP_KEY=.+' .env; then \
+        php artisan key:generate --force --ansi --quiet; \
+    fi
 
 # Build assets
 RUN npm run build \
