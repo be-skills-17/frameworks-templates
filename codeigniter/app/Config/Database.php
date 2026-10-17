@@ -194,6 +194,15 @@ class Database extends Config
     {
         parent::__construct();
 
+        // The competition environment passes the module's database to the container: it wins over
+        // database.default.* in .env
+        foreach (['hostname' => 'DB_HOST', 'port' => 'DB_PORT', 'database' => 'DB_DATABASE',
+                  'username' => 'DB_USERNAME', 'password' => 'DB_PASSWORD'] as $key => $variable) {
+            if (($value = getenv($variable)) !== false && $value !== '') {
+                $this->default[$key] = $key === 'port' ? (int) $value : $value;
+            }
+        }
+
         // Ensure that we always set the database group to 'tests' if
         // we are currently running an automated test suite, so that
         // we don't overwrite live data on accident.

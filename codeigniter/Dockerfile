@@ -1,11 +1,7 @@
 FROM php:8.4-apache
 
-# Accept database and app configuration as build arguments
-ARG DB_NAME
-ARG DB_USERNAME
-ARG DB_PASSWORD
-ARG DB_HOST
-ARG APP_URL
+# The database and APP_URL are not build arguments: the competition environment passes DB_HOST, DB_PORT,
+# DB_DATABASE, DB_USERNAME, DB_PASSWORD and APP_URL to the container when it starts
 ARG COMPOSER_PROXY
 
 # Install system dependencies
@@ -50,13 +46,6 @@ RUN if [ -n "$COMPOSER_PROXY" ]; then \
 
 # Copy application code
 COPY . .
-
-# Force correct values in .env (overrides any competitor changes)
-RUN sed -i "s|^database.default.database =.*|database.default.database = ${DB_NAME}|" .env && \
-    sed -i "s|^database.default.username =.*|database.default.username = ${DB_USERNAME}|" .env && \
-    sed -i "s|^database.default.password =.*|database.default.password = ${DB_PASSWORD}|" .env && \
-    sed -i "s|^database.default.hostname =.*|database.default.hostname = ${DB_HOST}|" .env && \
-    sed -i "s|^app.baseURL =.*|app.baseURL = '${APP_URL}'|" .env
 
 # Set proper permissions for writable directory
 RUN chown -R www-data:www-data /var/www/html \

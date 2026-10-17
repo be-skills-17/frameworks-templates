@@ -1,11 +1,7 @@
 FROM php:8.4-apache
 
-# Accept database and app configuration as build arguments
-ARG DB_NAME
-ARG DB_USERNAME
-ARG DB_PASSWORD
-ARG DB_HOST
-ARG APP_URL
+# The database and APP_URL are not build arguments: the competition environment passes DB_HOST, DB_PORT,
+# DB_DATABASE, DB_USERNAME, DB_PASSWORD and APP_URL to the container when it starts
 ARG COMPOSER_PROXY
 
 # Install system dependencies
@@ -55,20 +51,10 @@ RUN if [ -n "$COMPOSER_PROXY" ]; then \
 # Copy application code
 COPY . .
 
-# Create .env with database config (file is gitignored so must be generated at build time)
-RUN printf "YII_ENV=prod\nYII_DEBUG=false\nDB_DSN=mysql:host=%s;dbname=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\n" \
-    "${DB_HOST}" "${DB_NAME}" "${DB_USERNAME}" "${DB_PASSWORD}" > .env
-
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/runtime \
     && chmod -R 775 /var/www/html/web/assets
-
-# Set database environment variables (read by config/web.php)
-ENV DB_DSN="mysql:host=${DB_HOST};dbname=${DB_NAME}"
-ENV DB_USERNAME=${DB_USERNAME}
-ENV DB_PASSWORD=${DB_PASSWORD}
-ENV APP_URL=${APP_URL}
 
 ENV YII_ENV=prod
 ENV YII_DEBUG=false

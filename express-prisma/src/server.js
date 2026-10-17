@@ -1,3 +1,4 @@
+import './database-url.js';
 import dotenv from 'dotenv';
 dotenv.config();
 

@@ -35,8 +35,9 @@ All templates include:
 
 Includes MySQL auto-configuration:
 - Auto-migrations on container start
-- Dynamic database credentials via build args
-- Database naming: `{username}_module_{letter}`
+- Database credentials and site URL passed to the container when it starts (`DB_HOST`, `DB_PORT`, `DB_DATABASE`,
+  `DB_USERNAME`, `DB_PASSWORD`, `APP_URL`), read before `.env` (also by codeigniter, yii, express-prisma and php)
+- Database naming: `{username}_module-{letter}`
 
 ## Usage
 

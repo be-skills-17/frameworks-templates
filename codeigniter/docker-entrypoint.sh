@@ -7,15 +7,11 @@ echo "=== CodeIgniter 4 Container Starting ==="
 # Run migrations in background so Apache starts immediately
 (
     sleep 3
-    DB_HOST=$(grep "^database.default.hostname" /var/www/html/.env | cut -d'=' -f2 | tr -d ' ')
-    DB_NAME=$(grep "^database.default.database" /var/www/html/.env | cut -d'=' -f2 | tr -d ' ')
-    DB_USER=$(grep "^database.default.username" /var/www/html/.env | cut -d'=' -f2 | tr -d ' ')
-    DB_PASS=$(grep "^database.default.password" /var/www/html/.env | cut -d'=' -f2 | tr -d ' ')
-
     MAX_TRIES=30
     TRIES=0
+    # The database passed to the container by the competition environment (read by app/Config/Database.php)
     while [ $TRIES -lt $MAX_TRIES ]; do
-        if php -r "try { new PDO('mysql:host=$DB_HOST;dbname=$DB_NAME', '$DB_USER', '$DB_PASS'); echo 'OK'; } catch(Exception \$e) { exit(1); }" 2>/dev/null | grep -q "OK"; then
+        if php -r 'try { new PDO("mysql:host=" . getenv("DB_HOST") . ";port=" . (getenv("DB_PORT") ?: 3306) . ";dbname=" . getenv("DB_DATABASE"), getenv("DB_USERNAME"), getenv("DB_PASSWORD")); echo "OK"; } catch (Exception $e) { exit(1); }' 2>/dev/null | grep -q "OK"; then
             echo "  Database connected"
             cd /var/www/html && php spark migrate --all 2>/dev/null && echo "  Migrations completed" || echo "  [WARN] Migration failed"
             break

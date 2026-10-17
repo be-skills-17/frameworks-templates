@@ -18,15 +18,16 @@ A vanilla PHP template for WorldSkills UK competitions. This template provides a
 
 ## Database Connection
 
-Database credentials are read from the `.env` file at the root of the project (you fill it in yourself).
+Once deployed, the container receives your module's database as environment variables. To run the project on
+your PC, put the same variables in the `.env` file at the root of the project (you fill it in yourself).
 Load it with `config.php`, then read the values with `getenv()`:
 
 ```php
 require_once __DIR__ . '/config.php';
 
 $db_host = getenv('DB_HOST') ?: 'db.worldskills.uk';
-$db_name = getenv('DB_NAME') ?: 'compXX_module_x';
-$db_user = getenv('DB_USER') ?: 'compXX';
+$db_name = getenv('DB_DATABASE') ?: 'compXX_module-x';
+$db_user = getenv('DB_USERNAME') ?: 'compXX';
 $db_pass = getenv('DB_PASSWORD') ?: 'your_password';
 
 $pdo = new PDO(
@@ -42,7 +43,7 @@ $pdo = new PDO(
 ```
 php/
 ├── index.php           # Main entry point
-├── config.php          # Loads .env into getenv()
+├── config.php          # Loads .env into getenv() (variables already set win)
 ├── .env                # Your configuration (DB credentials...)
 ├── api/                # API endpoints
 │   ├── hello.php       # Example endpoint
@@ -63,8 +64,8 @@ header('Content-Type: application/json');
 
 // Database connection
 $pdo = new PDO(
-    "mysql:host=" . getenv('DB_HOST') . ";dbname=" . getenv('DB_NAME'),
-    getenv('DB_USER'),
+    "mysql:host=" . getenv('DB_HOST') . ";dbname=" . getenv('DB_DATABASE'),
+    getenv('DB_USERNAME'),
     getenv('DB_PASSWORD')
 );
 
@@ -81,12 +82,15 @@ echo json_encode([
 
 ## Environment Variables
 
-Set them in `.env` (committed with your code and copied into the image; Apache never serves it):
+Once deployed, the container receives them from the competition environment (they win over `.env`). On your PC,
+set them in `.env` (Apache never serves it):
 
-- `DB_HOST` - Database host (db.worldskills.uk)
-- `DB_NAME` - Database name (compXX_module_x)
-- `DB_USER` - Database user (compXX)
+- `DB_HOST` - Database host (`competitor_db` once deployed)
+- `DB_PORT` - Database port (3306)
+- `DB_DATABASE` - Database name (compXX_module-x)
+- `DB_USERNAME` - Database user (compXX)
 - `DB_PASSWORD` - Database password
+- `APP_URL` - URL of the site
 
 ## Deployment
 

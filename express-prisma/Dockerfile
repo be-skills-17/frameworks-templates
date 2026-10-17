@@ -1,11 +1,8 @@
 FROM node:22-alpine
 
-# Accept database configuration as build arguments
+# The database is not a build argument: the competition environment passes DB_HOST, DB_PORT, DB_DATABASE,
+# DB_USERNAME and DB_PASSWORD to the container when it starts (src/database-url.js builds DATABASE_URL from them)
 ARG NPM_REGISTRY
-ARG DB_HOST
-ARG DB_NAME
-ARG DB_USERNAME
-ARG DB_PASSWORD
 
 # Configure npm registry for Verdaccio cache
 RUN if [ -n "$NPM_REGISTRY" ]; then \
@@ -32,9 +29,6 @@ RUN npx prisma generate
 
 # Copy application code
 COPY . .
-
-# Create .env with database URL (file is gitignored so must be generated at build time)
-RUN echo "DATABASE_URL=\"mysql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:3306/${DB_NAME}\"" > .env
 
 EXPOSE 80
 

@@ -199,4 +199,14 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // The competition environment passes the site URL to the container: it wins over app.baseURL in .env
+        if (($url = getenv('APP_URL')) !== false && $url !== '') {
+            $this->baseURL = rtrim($url, '/') . '/';
+        }
+    }
 }

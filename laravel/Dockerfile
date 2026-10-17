@@ -1,11 +1,7 @@
 FROM php:8.4-apache
 
-# Accept database and app configuration as build arguments
-ARG DB_NAME
-ARG DB_USERNAME
-ARG DB_PASSWORD
-ARG DB_HOST
-ARG APP_URL
+# The database and APP_URL are not build arguments: the competition environment passes DB_HOST, DB_PORT,
+# DB_DATABASE, DB_USERNAME, DB_PASSWORD and APP_URL to the container when it starts, and Laravel prefers them to .env
 ARG COMPOSER_PROXY
 
 # Install system dependencies and Node.js in a single layer (quiet mode)

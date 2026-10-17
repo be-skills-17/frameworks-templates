@@ -32,11 +32,6 @@ jobs:
       env:
         DOMAIN: ${{ secrets.DOMAIN }}
         SERVER_IP: ${{ secrets.SERVER_IP }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_USERNAME: ${{ secrets.DB_USERNAME }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        APP_URL: ${{ secrets.APP_URL }}
         NPM_REGISTRY: ${{ secrets.NPM_REGISTRY_URL }}
         COMPOSER_PROXY: ${{ secrets.COMPOSER_PROXY_URL }}
       run: |
@@ -50,11 +45,6 @@ jobs:
         DOCKER_BUILDKIT=0 docker build \
           --network gitea \
           --add-host=db.${DOMAIN}:${SERVER_IP} \
-          --build-arg DB_HOST=${DB_HOST} \
-          --build-arg DB_NAME=${DB_NAME} \
-          --build-arg DB_USERNAME=${DB_USERNAME} \
-          --build-arg DB_PASSWORD=${DB_PASSWORD} \
-          --build-arg APP_URL=${APP_URL} \
           --build-arg COMPOSER_PROXY=${COMPOSER_PROXY} \
           --build-arg NPM_REGISTRY=${NPM_REGISTRY} \
           . --file Dockerfile \

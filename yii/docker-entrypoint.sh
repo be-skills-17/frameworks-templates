@@ -4,6 +4,12 @@
 
 echo "=== Yii2 Container Starting ==="
 
+# The competition environment passes DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME and DB_PASSWORD;
+# config/web.php reads the DSN from DB_DSN (exported: Apache and its PHP inherit it)
+if [ -z "$DB_DSN" ] && [ -n "$DB_HOST" ]; then
+    export DB_DSN="mysql:host=$DB_HOST;port=${DB_PORT:-3306};dbname=$DB_DATABASE"
+fi
+
 # Run migrations in background so Apache starts immediately
 (
     sleep 3
