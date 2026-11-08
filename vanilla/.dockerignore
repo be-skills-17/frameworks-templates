@@ -1,0 +1,10 @@
+# The whole build context is copied to the web root: keep repository internals out of it
+# (.git/config holds the CI clone URL with the competitor's password)
+.git
+.github
+.gitignore
+.dockerignore
+.npmrc
+Dockerfile
+README.md
+ssl-cert.crt
