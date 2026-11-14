@@ -10,11 +10,7 @@
         PHP - It works!
     </h1>
     <p style="margin-top: 1rem; color: #666;">
-        Your PHP application is running successfully (PHP <?= htmlspecialchars(PHP_VERSION) ?>).
-    </p>
-    <p style="margin-top: 1rem; color: #666;">
-        Want plain HTML instead? Delete <code>index.php</code>: Apache serves <code>index.php</code> before
-        <code>index.html</code>, so <code>index.html</code> is only shown once <code>index.php</code> is gone.
+        Your PHP application is running successfully.
     </p>
 </body>
 </html>

@@ -1,7 +1,6 @@
-# Vanilla PHP Template
+# PHP Template
 
-A vanilla template for WorldSkills UK competitions: static HTML, CSS and JavaScript and/or plain PHP, served by
-PHP 8.3 + Apache. Use it for static pages, PHP pages and APIs alike.
+A vanilla PHP template for WorldSkills UK competitions. This template provides a minimal PHP 8.3 + Apache environment for building web applications and APIs.
 
 ## Features
 
@@ -13,8 +12,7 @@ PHP 8.3 + Apache. Use it for static pages, PHP pages and APIs alike.
 
 ## Quick Start
 
-1. **Choose the entry point** - `index.php` is served before `index.html`: for a static site, delete `index.php`
-   and edit `index.html`; for PHP, edit `index.php` (and delete `index.html` if you don't need it)
+1. **Edit `index.php`** - Main entry point
 2. **Create API endpoints** in `api/` directory
 3. **Push to deploy** - Automatic build and deployment
 
@@ -43,9 +41,8 @@ $pdo = new PDO(
 ## Directory Structure
 
 ```
-vanilla-php/
-├── index.php           # PHP entry point (served first: delete it to serve index.html)
-├── index.html          # Static entry point
+php/
+├── index.php           # Main entry point
 ├── config.php          # Loads .env into getenv() (variables already set win)
 ├── .env                # Your configuration (DB credentials...)
 ├── api/                # API endpoints
@@ -115,8 +112,8 @@ Your application will be available at:
 php -S localhost:8000
 
 # Or use Docker
-docker build -t vanilla-php-app .
-docker run -p 8080:80 vanilla-php-app
+docker build -t php-app .
+docker run -p 8080:80 php-app
 ```
 
 ## Installed PHP Extensions
@@ -129,7 +126,6 @@ docker run -p 8080:80 vanilla-php-app
 
 - mod_rewrite enabled
 - DocumentRoot: `/var/www/html`
-- DirectoryIndex: `index.php`, then `index.html`
 
 ## Tips
 

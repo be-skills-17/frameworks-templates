@@ -1,7 +1,6 @@
-# Static Project Template
+# Vanilla Project Template
 
-A minimal template for HTML, CSS and JavaScript projects without frameworks. Static files served by nginx (no PHP:
-use the `vanilla-php` template for that).
+A minimal template for HTML, CSS and JavaScript projects without frameworks. Static files served by nginx.
 
 ## How to Use
 1. Edit index.html as your starting point
