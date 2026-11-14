@@ -10,14 +10,14 @@ Pre-configured framework templates for offline competition environments.
 - **svelte** - SvelteKit with static adapter
 - **angular** - Angular CLI
 - **nextjs** - Next.js
-- **vanillajs** - Vanilla JavaScript
+- **static** - Static HTML, CSS and JavaScript served by nginx
 
 ### Backend (Node.js)
 - **expressjs** - Express.js with Sequelize
 - **express-prisma** - Express.js with Prisma ORM
 
 ### Backend (PHP)
-- **php** - Plain PHP with Apache
+- **vanilla-php** - Static HTML/CSS/JS and plain PHP with Apache
 - **laravel** - Laravel 12 with MySQL auto-configuration
 - **codeigniter** - CodeIgniter 4
 - **yii** - Yii 2
@@ -36,7 +36,7 @@ All templates include:
 Includes MySQL auto-configuration:
 - Auto-migrations on container start
 - Database credentials and site URL passed to the container when it starts (`DB_HOST`, `DB_PORT`, `DB_DATABASE`,
-  `DB_USERNAME`, `DB_PASSWORD`, `APP_URL`), read before `.env` (also by codeigniter, yii, express-prisma and php)
+  `DB_USERNAME`, `DB_PASSWORD`, `APP_URL`), read before `.env` (also by codeigniter, yii, express-prisma and vanilla-php)
 - Database naming: `{username}_module-{letter}`
 
 ## Usage
